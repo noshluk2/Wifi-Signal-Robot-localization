@@ -1,28 +1,25 @@
 import utilities as ut
 import threading
 
-import socket
-port = 5000
-sock = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
-sock.bind(('', port))
 motors = ut.motor_setup(23,24,25,14,15,4)
 encoders = ut.encoder_setup(27,10,5,6)
-data, addr = sock.recvfrom(1024) 
-drive_flag=False
 
+drive_flag=False
+goal_ticks = 800
 motors.forward()
 
-def threaded_loop_function():
+def thread_goal_ticks():
     global drive_flag
-    
-    threading.Timer(0.5,threaded_loop_function).start()
-    # if(drive_flag):
-    #     motors.forward()
-    # else:
-    #     motors.stop()
-    # drive_flag=not drive_flag
-    print(motors.get_st_error(encoders.get_l_enc() , encoders.get_r_enc()))
-    encoders.clear_encoders()
+
+    threading.Timer(0.5,thread_goal_ticks).start()
+    remaining_ticks = goal_ticks - encoders.get_l_enc()
+    if(remaining_ticks < 10):
+        motors.stop()
+        encoders.print_encoders_values()
+        encoders.clear_encoders()
+        encoders.print_encoders_values()
+    else:
+        print("Remaining Ticks : "remaining_ticks)
 
 
-threaded_loop_function()
+thread_goal_ticks()

@@ -26,36 +26,39 @@ class encoder_setup(object):
         if GPIO.input(self.r_en_a) == GPIO.input(self.r_en_b):
             self.count_R=self.count_R + 1
         else :
-            self.count_R = self.count_R - 1  
-        
+            self.count_R = self.count_R - 1
+
 
 
     def Update_encL(self,channel):
         if GPIO.input(self.l_en_a) == GPIO.input(self.l_en_b):
             self.count_L=self.count_L + 1
         else :
-            self.count_L = self.count_L - 1  
+            self.count_L = self.count_L - 1
         return (self.count_L)
-    
+
     def get_r_enc(self):
         return self.count_R
 
     def get_l_enc(self):
         return self.count_L
 
+    def print_encoders_values(self):
+        print(self.count_L, " / " ,self.count_R)
+
 
     def clear_encoders(self):
         self.count_R=0
         self.count_L=0
 
-        
 
 
-        
+
+
 
 class motor_setup(object):
     def __init__(self,mr_a,mr_b,mr_en,ml_a,ml_b,ml_en):
-        
+
 
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(mr_a, GPIO.OUT)
@@ -89,7 +92,7 @@ class motor_setup(object):
         self.pwm_r.ChangeDutyCycle(50)
         self.pwm_l.ChangeDutyCycle(60)
         print("\tForward")
-    
+
     def get_st_error(self,enc_r,enc_l): # Straight line error
         self.error= enc_l - enc_r
         #if positive then left encoder is moving faster
@@ -111,9 +114,8 @@ class motor_setup(object):
 #         self.sock = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
 #         self.sock.bind(('', self.port))
 #     def data_recieved(self):
-#         self.data, addr = self.sock.recvfrom(1024) 
+#         self.data, addr = self.sock.recvfrom(1024)
 #         s=(self.data).decode()
 #         return s
-        
+
         # return  self.data
-        
