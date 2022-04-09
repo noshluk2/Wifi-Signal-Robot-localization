@@ -15,12 +15,6 @@ class encoder_setup(object):
         GPIO.add_event_detect(l_en_a, GPIO.BOTH, callback=self.Update_encL)
         self.count_R =0
         self.count_L=0
-        self.wheel_diameter = 0.66
-        self.AXLE_LENGTH = 1.35
-        self.meter_per_ticks = 2.1
-        self.x=0
-        self.y=0
-        self.theta=0
 
     def Update_encR(self,channel):
         if GPIO.input(self.r_en_a) == GPIO.input(self.r_en_b):
@@ -35,7 +29,7 @@ class encoder_setup(object):
             self.count_L=self.count_L + 1
         else :
             self.count_L = self.count_L - 1
-        return (self.count_L)
+        
 
     def get_r_enc(self):
         return self.count_R
@@ -50,6 +44,7 @@ class encoder_setup(object):
     def clear_encoders(self):
         self.count_R=0
         self.count_L=0
+        GPIO.cleanup()
 
 
 
@@ -67,6 +62,10 @@ class motor_setup(object):
         GPIO.setup(ml_a, GPIO.OUT)
         GPIO.setup(ml_b, GPIO.OUT)
         GPIO.setup(ml_en,GPIO.OUT)
+        GPIO.output(mr_a,GPIO.HIGH)
+        GPIO.output(mr_b,GPIO.LOW)
+        GPIO.output(ml_a,GPIO.HIGH)
+        GPIO.output(ml_b,GPIO.LOW)
         self.mr_a=mr_a;self.mr_b=mr_b;self.ml_a=ml_a;self.ml_a=mr_a;self.ml_b=ml_b;
         self.mr_en=mr_en;self.ml_en=ml_en
         self.pwm_r =  GPIO.PWM(mr_en,1000)
@@ -76,10 +75,7 @@ class motor_setup(object):
         self.car_turn_on()
 
     def car_turn_on(self):
-        GPIO.output(self.mr_a,GPIO.HIGH)
-        GPIO.output(self.mr_b,GPIO.LOW)
-        GPIO.output(self.ml_a,GPIO.HIGH)
-        GPIO.output(self.ml_b,GPIO.LOW)
+        
         print("Car is ready to drive ")
 
 
@@ -89,8 +85,8 @@ class motor_setup(object):
         print("\tStopping")
 
     def forward(self):
-        self.pwm_r.ChangeDutyCycle(50)
-        self.pwm_l.ChangeDutyCycle(60)
+        self.pwm_r.ChangeDutyCycle(30)
+        self.pwm_l.ChangeDutyCycle(30)
         print("\tForward")
 
     def get_st_error(self,enc_r,enc_l): # Straight line error

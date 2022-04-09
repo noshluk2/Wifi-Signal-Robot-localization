@@ -67,6 +67,8 @@ while(1):
         print("forward")
         GPIO.output(right_motor_a,GPIO.HIGH)
         GPIO.output(right_motor_b,GPIO.LOW)
+        GPIO.output(left_motor_a,GPIO.HIGH)
+        GPIO.output(left_motor_b,GPIO.LOW)
         temp1=1
         x='z'
 
