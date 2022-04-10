@@ -10,6 +10,7 @@ This repository is for the robot which captures multiple signals from Access poi
   - Encoders
   - Motors
   - udp communication
+  
 ## Requirments
 - ### Hardware
   - Raspberry pi 4
@@ -57,5 +58,17 @@ This repository is for the robot which captures multiple signals from Access poi
     git clone https://github.com/noshluk2/Wifi-Signal-Robot-localization
     ```
   - Run the following python file
+  
+  
+### Libraries Included :
+
+- Kalman FIlter for MPU 
+- - rocheparadox/kalman filter python for mpu6050
+
+### Robot 3D models
+
+### Electornic Connections
+
+
 
 

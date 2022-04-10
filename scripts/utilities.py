@@ -1,18 +1,21 @@
 import RPi.GPIO as GPIO
 from numpy import interp
 import socket
+import sys
 class encoder_setup(object):
     def __init__(self, r_en_a,r_en_b,l_en_a,l_en_b):
         GPIO.setmode(GPIO.BCM)
-        GPIO.setup(r_en_a, GPIO.IN)
-        GPIO.setup(r_en_b, GPIO.IN)
-        GPIO.setup(l_en_a, GPIO.IN)
-        GPIO.setup(l_en_b, GPIO.IN)
+        GPIO.setup(r_en_a, GPIO.IN,pull_up_down=GPIO.PUD_UP)
+        GPIO.setup(r_en_b, GPIO.IN,pull_up_down=GPIO.PUD_UP)
+        GPIO.setup(l_en_a, GPIO.IN,pull_up_down=GPIO.PUD_UP)
+        GPIO.setup(l_en_b, GPIO.IN,pull_up_down=GPIO.PUD_UP)
         self.l_en_a=l_en_a;self.l_en_b=l_en_b;
         self.r_en_a=r_en_a;self.r_en_b=r_en_b;
 
-        GPIO.add_event_detect(r_en_a, GPIO.BOTH, callback=self.Update_encR)
-        GPIO.add_event_detect(l_en_a, GPIO.BOTH, callback=self.Update_encL)
+        GPIO.add_event_detect(r_en_a, GPIO.BOTH,
+                              callback=self.Update_encR,bouncetime=5)
+        GPIO.add_event_detect(l_en_a, GPIO.BOTH,
+                              callback=self.Update_encL,bouncetime=5)
         self.count_R =0
         self.count_L=0
 
@@ -29,10 +32,12 @@ class encoder_setup(object):
             self.count_L=self.count_L + 1
         else :
             self.count_L = self.count_L - 1
+            print(self.count_L)
         
 
     def get_r_enc(self):
         return self.count_R
+        
 
     def get_l_enc(self):
         return self.count_L
@@ -44,7 +49,6 @@ class encoder_setup(object):
     def clear_encoders(self):
         self.count_R=0
         self.count_L=0
-        GPIO.cleanup()
 
 
 
@@ -72,31 +76,40 @@ class motor_setup(object):
         self.pwm_l =  GPIO.PWM(ml_en,1000)
         self.pwm_l.start(0)
         self.pwm_r.start(0)
-        self.car_turn_on()
+        self.left_pwm=0;
 
-    def car_turn_on(self):
-        
-        print("Car is ready to drive ")
 
 
     def stop(self):
         self.pwm_r.ChangeDutyCycle(0)
         self.pwm_l.ChangeDutyCycle(0)
-        print("\tStopping")
+        
+    def left(self):
+        self.pwm_r.ChangeDutyCycle(30)
+        self.pwm_l.ChangeDutyCycle(0)
+        
+    def right(self):
+        self.pwm_r.ChangeDutyCycle(0)
+        self.pwm_l.ChangeDutyCycle(30)
+        
 
     def forward(self):
         self.pwm_r.ChangeDutyCycle(30)
         self.pwm_l.ChangeDutyCycle(30)
-        print("\tForward")
 
     def get_st_error(self,enc_r,enc_l): # Straight line error
         self.error= enc_l - enc_r
         #if positive then left encoder is moving faster
-        left_pwm = 50 - self.error
-        left_pwm=interp(left_pwm,[0,100],[30,50])
-        self.pwm_r.ChangeDutyCycle(50)
-        self.pwm_l.ChangeDutyCycle(left_pwm)
-        return self.error
+        #left_pwm = 50 - self.error
+        self.left_pwm=interp(self.error,[0,20],[25,45])
+        self.pwm_r.ChangeDutyCycle(30)
+        self.pwm_l.ChangeDutyCycle(self.left_pwm)
+        print("Error " ,self.error , "Left PWM " , self.left_pwm)
+        
+        #return self.error
+    def motor_turn_off(self):
+        GPIO.cleanup()
+        sys.exit(0)
 
 
 
