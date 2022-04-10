@@ -1,64 +1,54 @@
-"""
-Encoder library for Raspberry Pi for measuring quadrature encoded signals.
-created by Mivallion <mivallion@gmail.com>
-Version 1.0 - 01 april 2020 - inital release
-"""
-
 import RPi.GPIO as GPIO
+import threading
 
 class Encoder(object):
-    """
-    Encoder class allows to work with rotary encoder
-    which connected via two pin A and B.
-    Works only on interrupts because all RPi pins allow that.
-    This library is a simple port of the Arduino Encoder library
-    (https://github.com/PaulStoffregen/Encoder) 
-    """
-    def __init__(self, A, B):
+    def __init__(self, r_en_a,r_en_b,l_en_a,l_en_b):
         GPIO.setmode(GPIO.BCM)
-        GPIO.setup(A, GPIO.IN)
-        GPIO.setup(B, GPIO.IN)
-        self.A = A
-        self.B = B
-        self.pos = 0
-        self.state = 0
-        if GPIO.input(A):
-            self.state |= 1
-        if GPIO.input(B):
-            self.state |= 2
-        GPIO.add_event_detect(A, GPIO.BOTH, callback=self.__update)
-        GPIO.add_event_detect(B, GPIO.BOTH, callback=self.__update)
+        GPIO.setup(r_en_a, GPIO.IN)
+        GPIO.setup(r_en_b, GPIO.IN)
+        GPIO.setup(l_en_a, GPIO.IN)
+        GPIO.setup(l_en_b, GPIO.IN)
+        self.l_en_a=l_en_a;self.l_en_b=l_en_b;
+        self.r_en_a=r_en_a;self.r_en_b=r_en_b;
 
-    """
-    update() calling every time when value on A or B pins changes.
-    It updates the current position based on previous and current states
-    of the rotary encoder.
-    """
-    def __update(self, channel):
-        state = self.state & 3
-        if GPIO.input(self.A):
-            state |= 4
-        if GPIO.input(self.B):
-            state |= 8
+        GPIO.add_event_detect(r_en_a, GPIO.BOTH, callback=self.Update_encR)
+        GPIO.add_event_detect(l_en_a, GPIO.BOTH, callback=self.Update_encL)
+        self.count_R =0
+        self.count_L=0
 
-        self.state = state >> 2
-
-        if state == 1 or state == 7 or state == 8 or state == 14:
-            self.pos += 1
-        elif state == 2 or state == 4 or state == 11 or state == 13:
-            self.pos -= 1
-        elif state == 3 or state == 12:
-            self.pos += 2
-        elif state == 6 or state == 9:
-            self.pos -= 2
-
-
-    """
-    read() simply returns the current position of the rotary encoder.
-    """
-    def read(self):
-        return self.pos
-    def clear(self):
-        self.pose = 0
-        self.state=0
+    def Update_encR(self,channel):
+        if GPIO.input(self.r_en_a) == GPIO.input(self.r_en_b):
+            self.count_R=self.count_R + 1
+        else :
+            self.count_R = self.count_R - 1  
         
+
+
+    def Update_encL(self,channel):
+        if GPIO.input(self.l_en_a) == GPIO.input(self.l_en_b):
+            self.count_L=self.count_L + 1
+        else :
+            self.count_L = self.count_L - 1  
+        return (self.count_L)
+    
+    def get_r_enc(self):
+        return self.count_R
+    def get_l_enc(self):
+        return self.count_L
+    def clear_encoders(self):
+        self.count_R=0
+        self.count_L=0
+
+# r_en_a = 27 
+# r_en_b = 10
+
+# l_en_a = 5
+# l_en_b = 6
+
+# enc_obj = Encoder(27,10,5,6)
+
+# def update_encoders():
+#     threading.Timer(1,update_encoders).start()
+#     print(" looping ")
+
+# update_encoders()

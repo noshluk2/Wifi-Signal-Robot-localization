@@ -33,11 +33,11 @@ class encoder_setup(object):
         else :
             self.count_L = self.count_L - 1
             print(self.count_L)
-        
+
 
     def get_r_enc(self):
         return self.count_R
-        
+
 
     def get_l_enc(self):
         return self.count_L
@@ -83,15 +83,15 @@ class motor_setup(object):
     def stop(self):
         self.pwm_r.ChangeDutyCycle(0)
         self.pwm_l.ChangeDutyCycle(0)
-        
+
     def left(self):
         self.pwm_r.ChangeDutyCycle(30)
         self.pwm_l.ChangeDutyCycle(0)
-        
+
     def right(self):
         self.pwm_r.ChangeDutyCycle(0)
         self.pwm_l.ChangeDutyCycle(30)
-        
+
 
     def forward(self):
         self.pwm_r.ChangeDutyCycle(30)
@@ -105,7 +105,7 @@ class motor_setup(object):
         self.pwm_r.ChangeDutyCycle(30)
         self.pwm_l.ChangeDutyCycle(self.left_pwm)
         print("Error " ,self.error , "Left PWM " , self.left_pwm)
-        
+
         #return self.error
     def motor_turn_off(self):
         GPIO.cleanup()
