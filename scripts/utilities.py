@@ -24,6 +24,7 @@ class encoder_setup(object):
             self.count_R=self.count_R + 1
         else :
             self.count_R = self.count_R - 1
+        #print(self.count_R)
 
 
 
@@ -32,7 +33,7 @@ class encoder_setup(object):
             self.count_L=self.count_L + 1
         else :
             self.count_L = self.count_L - 1
-            print(self.count_L)
+        #print(self.count_L)
 
 
     def get_r_enc(self):
@@ -90,7 +91,8 @@ class motor_setup(object):
 
     def right(self):
         self.pwm_r.ChangeDutyCycle(0)
-        self.pwm_l.ChangeDutyCycle(30)
+        self.pwm_l.ChangeDutyCycle(60)
+        
 
 
     def forward(self):
@@ -98,12 +100,13 @@ class motor_setup(object):
         self.pwm_l.ChangeDutyCycle(30)
 
     def get_st_error(self,enc_r,enc_l): # Straight line error
-        self.error= enc_l - enc_r
-        #if positive then left encoder is moving faster
-        #left_pwm = 50 - self.error
-        self.left_pwm=interp(self.error,[0,20],[25,45])
-        self.pwm_r.ChangeDutyCycle(30)
-        self.pwm_l.ChangeDutyCycle(self.left_pwm)
+        self.error= ( enc_l - enc_r ) * 0.5
+        '''
+        self.left_pwm=interp(self.error,[-5,20],[35,25])  
+        '''
+        self.pwm_r.ChangeDutyCycle(60)
+        self.pwm_l.ChangeDutyCycle(58)
+        #print("Error " ,self.error , "Left PWM " , self.left_pwm)
         print("Error " ,self.error , "Left PWM " , self.left_pwm)
 
         #return self.error
