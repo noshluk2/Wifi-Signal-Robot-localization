@@ -1,4 +1,4 @@
-import RPi.GPIO as GPIO          
+import RPi.GPIO as GPIO
 from time import sleep
 
 right_motor_a = 23
@@ -31,28 +31,20 @@ pwm_2.start(25)
 print("\n")
 print("The default speed & direction of motor is LOW & Forward.....")
 print("r-run s-stop f-forward b-backward l-low m-medium h-high e-exit")
-print("\n")    
+print("\n")
 
 while(1):
 
     x=input()
-    
-    if x=='r':
-        print("run")
-        if(temp1==1):
-         GPIO.output(right_motor_a,GPIO.HIGH)
-         GPIO.output(right_motor_b,GPIO.LOW)
-         GPIO.output(left_motor_a,GPIO.HIGH)
-         GPIO.output(left_motor_b,GPIO.LOW)
-         print("forward")
-         x='z'
-        else:
-         GPIO.output(right_motor_a,GPIO.LOW)
-         GPIO.output(right_motor_b,GPIO.HIGH)
-         GPIO.output(left_motor_a,GPIO.LOW)
-         GPIO.output(left_motor_b,GPIO.HIGH)
-         print("backward")
-         x='z'
+
+    if x=='f':
+        print("forward")
+        GPIO.output(right_motor_a,GPIO.HIGH)
+        GPIO.output(right_motor_b,GPIO.LOW)
+        GPIO.output(left_motor_a,GPIO.HIGH)
+        GPIO.output(left_motor_b,GPIO.LOW)
+        temp1=1
+        x='z'
 
 
     elif x=='s':
@@ -63,14 +55,24 @@ while(1):
         GPIO.output(left_motor_b,GPIO.LOW)
         x='z'
 
-    elif x=='f':
-        print("forward")
-        GPIO.output(right_motor_a,GPIO.HIGH)
-        GPIO.output(right_motor_b,GPIO.LOW)
+    elif x=='r':
+        print("right")
+        GPIO.output(right_motor_a,GPIO.LOW)
+        GPIO.output(right_motor_b,GPIO.HIGH)
         GPIO.output(left_motor_a,GPIO.HIGH)
         GPIO.output(left_motor_b,GPIO.LOW)
-        temp1=1
+        temp1=0
         x='z'
+    elif x=='l':
+        print("left")
+        GPIO.output(right_motor_b,GPIO.LOW)
+        GPIO.output(right_motor_a,GPIO.HIGH)
+        GPIO.output(left_motor_b,GPIO.HIGH)
+        GPIO.output(left_motor_a,GPIO.LOW)
+        temp1=0
+        x='z'
+
+
 
     elif x=='b':
         print("backward")
@@ -81,16 +83,10 @@ while(1):
         temp1=0
         x='z'
 
-    elif x=='l':
-        print("low")
-        pwm_1.ChangeDutyCycle(25)
-        pwm_2.ChangeDutyCycle(25)
-        x='z'
-
     elif x=='m':
         print("medium")
-        pwm_1.ChangeDutyCycle(50)
-        pwm_2.ChangeDutyCycle(50)
+        pwm_1.ChangeDutyCycle(1)
+        pwm_2.ChangeDutyCycle(1)
         x='z'
 
     elif x=='h':
@@ -98,12 +94,12 @@ while(1):
         pwm_1.ChangeDutyCycle(75)
         pwm_2.ChangeDutyCycle(75)
         x='z'
-     
-    
+
+
     elif x=='e':
         GPIO.cleanup()
         break
-    
+
     else:
         print("<<<  wrong data  >>>")
         print("please right_motor_enter the defined data to continue.....")
