@@ -92,7 +92,7 @@ class motor_setup(object):
     def right(self):
         self.pwm_r.ChangeDutyCycle(0)
         self.pwm_l.ChangeDutyCycle(60)
-        
+
 
 
     def forward(self):
@@ -102,7 +102,7 @@ class motor_setup(object):
     def get_st_error(self,enc_r,enc_l): # Straight line error
         self.error= ( enc_l - enc_r ) * 0.5
         '''
-        self.left_pwm=interp(self.error,[-5,20],[35,25])  
+        self.left_pwm=interp(self.error,[-5,20],[35,25])
         '''
         self.pwm_r.ChangeDutyCycle(60)
         self.pwm_l.ChangeDutyCycle(58)
@@ -118,16 +118,3 @@ class motor_setup(object):
 
 
 
-
-# class udp_message(object):
-#     def __init__(self,port_number,server_ip):
-#         self.port = port_number
-#         self.server_ip=server_ip
-#         self.sock = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
-#         self.sock.bind(('', self.port))
-#     def data_recieved(self):
-#         self.data, addr = self.sock.recvfrom(1024)
-#         s=(self.data).decode()
-#         return s
-
-        # return  self.data
