@@ -21,8 +21,6 @@ object_.save_book()
 
 '''
 import subprocess
-from pyparsing import line
-import xlwt
 from xlwt import Workbook
 
 

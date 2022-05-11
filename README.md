@@ -10,7 +10,7 @@ This repository is for the robot which captures multiple signals from Access poi
   - Encoders
   - Motors
   - udp communication
-  
+
 ## Requirments
 - ### Hardware
   - Raspberry pi 4
@@ -21,20 +21,21 @@ This repository is for the robot which captures multiple signals from Access poi
   - 12V lipo battery
   - Srews ,pcb offsets and male to female/Male jupmer wires
 - ### Software
-  - Noobs on Rpi
-  - Python3
-  - VNC and SSH enabled
+  - Ubuntu Server 20.04
     ```
-    sudo raspi-config
+    sudo apt install python3-pip
     ```
-  - tightvnc
     ```
-    sudo apt get install tightvncserver
+    pip install xlwt
     ```
-  - xfce4
-
     ```
-    sudo apt install xfce4 xfce4-goodies
+    pip install RPi.GPIO
+    pip install nmcli
+    sudo apt install network-manager
+    ```
+    ```
+    sudo chown ubuntu /dev/gpiomem
+    sudo chmod g+rw /dev/gpiomem ## to access gpios
     ```
 
 ## Using This repository
@@ -43,11 +44,9 @@ This repository is for the robot which captures multiple signals from Access poi
   - Open terminal on your laptop
 
   ```
-  ssh pi@piIP # IP of raspberry pi
-  vncserver :1 # in rpi ssh
+  ssh ubuntu@pi_IP  # IP of raspberry pi
+  ## passwork is 'ubuntu'
   ```
-
-  - From laptop use real vnc to control rpi's screen using IP:1
 
 
 
@@ -58,16 +57,6 @@ This repository is for the robot which captures multiple signals from Access poi
     git clone https://github.com/noshluk2/Wifi-Signal-Robot-localization
     ```
   - Run the following python file
-  
-  
-### Libraries Included :
-
-- Kalman FIlter for MPU 
-- - rocheparadox/kalman filter python for mpu6050
-
-### Robot 3D models
-
-### Electornic Connections
 
 
 
