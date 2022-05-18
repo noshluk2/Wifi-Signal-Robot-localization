@@ -30,26 +30,24 @@ This repository is for the robot which captures multiple signals from Access poi
     ```
     ```
     pip install RPi.GPIO
-    pip install nmcli
     sudo apt install network-manager
     ```
+    ### Give access to utilize gpios
     ```
     sudo chown ubuntu /dev/gpiomem
-    sudo chmod g+rw /dev/gpiomem ## to access gpios
+    sudo chmod g+rw /dev/gpiomem
     ```
 
 ## Using This repository
-- Perform noobs installation and connect rpi4 with wifi
-### Running a screen share for RDC (remote desktop control)
+- Connect your RPI with Wifi -> [Video link](https://www.youtube.com/watch?v=s4ZDlV3tIuM&t=507s&ab_channel=RaspberryTips)
+
+### Running a SSH control through terminal ( shell only )
   - Open terminal on your laptop
-
+    - IP of raspberry pi -> get from any wifi conencted device info app
+    - passwork is 'ubuntu'
   ```
-  ssh ubuntu@pi_IP  # IP of raspberry pi
-  ## passwork is 'ubuntu'
+  ssh ubuntu@pi_IP
   ```
-
-
-
  ### Rpi repository run
   - Obtain the repository on Raspberry pi 4
 
@@ -57,7 +55,16 @@ This repository is for the robot which captures multiple signals from Access poi
     git clone https://github.com/noshluk2/Wifi-Signal-Robot-localization
     ```
   - Run the following python file
-
+    ```
+    cd Wifi-Signal-Robot-localization/scripts/
+    ```
+    ```
+    python3 drive_delay.py
+    ```
+  - Excel file would have been created and to check it
+    ```
+    ls # to see all files
+    ```
 
 
 

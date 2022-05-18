@@ -144,9 +144,9 @@ object_.save_book()
 '''
 class Network_data_to_excel:
     def __init__(self,file_name):
-      self.ssid_command     = self.cmdline('iwlist wlxec086b17f505 scan |  grep "SSID"' ).decode("utf-8")
-      self.mac_command = self.cmdline('iwlist wlxec086b17f505 scan |  grep "Address"' ).decode("utf-8")
-      self.strength_command      = self.cmdline('iwlist wlxec086b17f505 scan |  grep "Quality"' ).decode("utf-8")
+      self.ssid_command     = self.cmdline('iwlist wlan0 scan |  grep "SSID"' ).decode("utf-8")
+      self.mac_command      = self.cmdline('iwlist wlan0 scan |  grep "Address"' ).decode("utf-8")
+      self.strength_command = self.cmdline('iwlist wlan0 scan |  grep "Quality"' ).decode("utf-8")
       self.file_name=file_name
       self.index =1
 
