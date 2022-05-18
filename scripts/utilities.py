@@ -4,7 +4,7 @@ This Class conatins a class to initialize encoders connected to motor as well as
 '''
 import RPi.GPIO as GPIO
 import sys
-import subprocess
+from subprocess import PIPE, Popen
 from xlwt import Workbook
 
 
@@ -143,48 +143,57 @@ object_.save_book()
 
 '''
 class Network_data_to_excel:
-  def __init__(self, file_name):
-      self.ssid_command = "nmcli -t -f SSID device wifi"
-      self.strength_command = "nmcli -t -f SIGNAL device wifi"
-      self.mac_command = "nmcli -t -f BSSID device wifi"
-      self.index=1
+    def __init__(self,file_name):
+      self.ssid_command     = self.cmdline('iwlist wlxec086b17f505 scan |  grep "SSID"' ).decode("utf-8")
+      self.mac_command = self.cmdline('iwlist wlxec086b17f505 scan |  grep "Address"' ).decode("utf-8")
+      self.strength_command      = self.cmdline('iwlist wlxec086b17f505 scan |  grep "Quality"' ).decode("utf-8")
       self.file_name=file_name
+      self.index =1
 
-  def open_sheet(self):
-      self.excel_book = Workbook()
-      self.sheet = self.excel_book.add_sheet('Sheet 1')
-      self.sheet.write(0, 0, 'MAC')
-      self.sheet.write(0, 1, 'SSID')
-      self.sheet.write(0, 2, 'SIGNAL')
+    def open_sheet(self):
+        self.excel_book = Workbook()
+        self.sheet = self.excel_book.add_sheet('Sheet 1')
+        self.sheet.write(0, 0, 'MAC')
+        self.sheet.write(0, 1, 'SSID')
+        self.sheet.write(0, 2, 'SIGNAL')
+
+    def cmdline(self,command):
+        process = Popen(
+            args=command,
+            stdout=PIPE,
+            shell=True
+        )
+        return process.communicate()[0]
+
+    def spliter(self,array_in,end_space):
+        array_out=[]
+        for _,value in enumerate(array_in):
+            array_out.append(value[end_space:])
+        return array_out
+
+    def data_append(self):
+        ssids= self.ssid_command.split("ESSID:")
+        ssid_array=ssids[1:]
+
+        macs= self.mac_command.split("\n")
+        mac_array=self.spliter(macs,-17)
+
+        strengths= self.strength_command.split("dBm")
+        strength_array=self.spliter(strengths,-4)
+
+        values_to_zip = zip(mac_array,ssid_array,strength_array)
+        for mac,network_name,signal_strength in values_to_zip:
+            self.sheet.write(self.index, 0, mac)
+            self.sheet.write(self.index, 1, network_name)
+            self.sheet.write(self.index, 2, signal_strength)
+            self.index=self.index+1
 
 
-  def data_append(self):
+    def save_book(self):
+        self.excel_book.save(self.file_name)
 
-      ssid_data   = self.command_data(self.ssid_command    ,0)
-      mac_data    = self.command_data(self.mac_command     ,1)
-      signal_data = self.command_data(self.strength_command,0)
-
-      values_to_zip = zip(mac_data,ssid_data,signal_data)
-      for mac,network_name,signal_strength in values_to_zip:
-          self.sheet.write(self.index, 0, mac)
-          self.sheet.write(self.index, 1, network_name)
-          self.sheet.write(self.index, 2, signal_strength)
-          self.index=self.index+1
-
-  def command_data(self,command,replace):
-      process = subprocess.Popen(command.split(), stdout=subprocess.PIPE)
-      data, error = process.communicate()
-      if (replace):
-          data=data.replace (b'\:', b':')
-      data=data.decode('utf-8').split('\n')
-      return data
-
-  def save_book(self):
-      self.excel_book.save(self.file_name)
-
-  def line_skip(self,lines=1):
-      self.index=self.index + lines
-
+    def line_skip(self,lines=1):
+        self.index=self.index + lines
 
 
 

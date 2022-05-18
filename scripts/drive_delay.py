@@ -32,20 +32,17 @@ while(drive_flag):
     time.sleep(3)
     network_obj.data_append()
     network_obj.line_skip()
-    network_obj.data_append()
 
     motion(2)
     turn_90()
     network_obj.data_append()
     network_obj.line_skip()
-    network_obj.data_append()
 
 
     motion(1)
     turn_90()
     network_obj.data_append()
     network_obj.line_skip()
-    network_obj.data_append()
 
 
     drive_flag=False
