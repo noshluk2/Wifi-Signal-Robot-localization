@@ -170,6 +170,12 @@ class Network_data_to_excel:
         for _,value in enumerate(array_in):
             array_out.append(value[end_space:])
         return array_out
+    def print_data(self):
+        print(self.ssid_command)
+        print("-"*60)
+        print(self.mac_command)
+        print("-"*60)
+        print(self.strength_command)
 
     def data_append(self):
         ssids= self.ssid_command.split("ESSID:")
@@ -190,6 +196,7 @@ class Network_data_to_excel:
 
 
     def save_book(self):
+        print("saving book")
         self.excel_book.save(self.file_name)
 
     def line_skip(self,lines=1):

@@ -7,6 +7,9 @@ time.sleep(3)
 
 motors_obj = ut_obj.motor_setup(23,24,25,14,15,4)
 network_obj=ut_obj.Network_data_to_excel("venu_bot.xls")
+
+network_obj.print_data()
+
 network_obj.open_sheet()
 
 drive_flag=True
@@ -45,9 +48,13 @@ while(drive_flag):
     network_obj.line_skip()
 
 
-    drive_flag=False
-    motors_obj.motor_turn_off()
+
     network_obj.save_book()
+    motors_obj.motor_turn_off()
+    drive_flag=False
+
+# scp ubuntu@192.168.100.8:~/Wifi-Signal-Robot-localization/scripts/venu_bot.xls /home/luqman/rcv_files/
+## Command to download file into your system
 
 
 
