@@ -1,0 +1,11 @@
+{
+	"folders": [
+		{
+			"path": "../../../ros2_ws/src/ROS2-SlamBot-using-RaspberryPI"
+		},
+		{
+			"path": ".."
+		}
+	],
+	"settings": {}
+}

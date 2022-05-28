@@ -29,7 +29,7 @@ This repository is for the robot which captures multiple signals from Access poi
     pip install xlwt
     ```
     ```
-    pip install RPi.GPIO
+    sudo pip install RPi.GPIO
     sudo apt install network-manager
     ```
     ### Give access to utilize gpios
@@ -62,8 +62,10 @@ This repository is for the robot which captures multiple signals from Access poi
     python3 drive_delay.py
     ```
   - Excel file would have been created and to check it
+
+  - Testing Encoders
     ```
-    ls # to see all files
+    sudo python3 enc.py
     ```
 
 

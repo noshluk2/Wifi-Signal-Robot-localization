@@ -1,3 +1,6 @@
+'''
+This script is to test drive the motors and pwm signals with real time user inputs
+'''
 import RPi.GPIO as GPIO
 from time import sleep
 

@@ -1,3 +1,6 @@
+'''
+This script is to test the difference between Both of encoders
+'''
 import RPi.GPIO as GPIO
 import time
 import signal
@@ -9,16 +12,17 @@ import threading
 
 r_en_a = 22
 r_en_b = 27
+
 l_en_a = 5
 l_en_b = 6
 
 right_motor_a = 23
 right_motor_b = 24
 right_motor_en = 25
+
 left_motor_a = 14
 left_motor_b = 15
 left_motor_en = 4
-
 count_R =0;count_L=0;
 
 user_input=1
