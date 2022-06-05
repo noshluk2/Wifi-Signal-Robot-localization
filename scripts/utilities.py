@@ -2,7 +2,6 @@
 This Class conatins a class to initialize encoders connected to motor as well as all motor connection for PWM driving
 
 '''
-from turtle import forward
 import RPi.GPIO as GPIO
 import sys
 from subprocess import PIPE, Popen
@@ -49,14 +48,23 @@ class motors_enc_setup(object):
         PULSES_PER_REVOLUTION = 135;   WHEEL_DIAMETER        = 0.067
         self.meter_per_ticks  = math.pi * WHEEL_DIAMETER / PULSES_PER_REVOLUTION
 
+        self.go_to_goal=False ; self.goal_x=0;self.goal_y=0;
 
-    def Update_encR(self,):
+
+    def Update_encR(self,channel):
         self.count_R=self.count_R + 1
-        self.calculate_xy()
+        if(self.go_to_goal):
+            self.calculate_xy()
 
-    def Update_encL(self,):
+    def Update_encL(self,channel):
         self.count_L=self.count_L + 1
-        self.calculate_xy()
+        if(self.go_to_goal):
+            self.calculate_xy()
+
+    def gtg(self,x,y):
+        self.go_to_goal=True
+        self.goal_x=x
+        self.goal_y=y
 
     def calculate_xy(self):
         count_L_prev = self.count_L
@@ -67,15 +75,15 @@ class motors_enc_setup(object):
         disp_r_wheel = float(count_R_prev) * self.meter_per_ticks
 
         if (count_L_prev == count_R_prev):
-            self.x += disp_l_wheel * math.cos(theta)
-            self.y += disp_l_wheel * math.sin(theta)
+            self.x += disp_l_wheel * math.cos(self.theta)
+            self.y += disp_l_wheel * math.sin(self.theta)
 
         else:
             orientation_angle = (disp_r_wheel - disp_l_wheel)/self.AXLE_LENGTH
             disp_body   = (disp_r_wheel + disp_l_wheel) / 2.0;
             self.x += (disp_body/orientation_angle) * (math.sin(orientation_angle + self.theta) - math.sin(self.theta))
             self.y -= (disp_body/orientation_angle) * (math.cos(orientation_angle + self.theta) - math.cos(self.theta))
-            theta += orientation_angle
+            self.theta += orientation_angle
 
 
         while(self.theta > math.pi):
@@ -83,23 +91,23 @@ class motors_enc_setup(object):
         while(self.theta < -math.pi):
             self.theta += (2.0*math.pi)
 
-        print("X: " , round(x,3) ," Y: " , round(y,3) , " Theta: ",round(theta,3))
-        # self.Go_to_Goal_Calculations()
+        # print("X: " , round(self.x,3) ," Y: " , round(self.y,3) , " Theta: ",round(self.theta,3))
+        self.Go_to_Goal_Calculations()
 
-    def Go_to_Goal_Calculations(self,goal_x,goal_y):
-        self.des_x = goal_x - self.x;
-        self.des_y = goal_y - self.y;
+    def Go_to_Goal_Calculations(self):
+        self.des_x = self.goal_x - self.x;
+        self.des_y = self.goal_y - self.y;
         angle_to_goal = math.atan2(self.des_y, self.des_x);
         distance_to_goal  = math.sqrt(math.pow(self.des_x, 2) + math.pow(self.des_y, 2)); # distance to goal
-        error = angle_to_goal - self.theta;
-        print("self.des_x: ", round(self.des_x,3), " self.des_y: ", round(self.des_y,3)," DTG :",round(distance_to_goal,3), " Error: ",round(error,3) ," ATG ", round(angle_to_goal,3) )
+        self.error = angle_to_goal - self.theta;
+        print("self.des_x: ", round(self.des_x,3), " self.des_y: ", round(self.des_y,3)," DTG :",round(distance_to_goal,3), " Error: ",round(self.error,3) ," ATG ", round(angle_to_goal,3) )
         self.Update_Motors_Speeds()
 
 
     def Update_Motors_Speeds(self) :
-        if(angle_fixed):
+        if(self.angle_fixed):
             if(self.error <= 0):
-                angle_fixed = False
+                self.angle_fixed = False
                 print("\n\nAngle is set towards Goal\n\n")
             else:
                 self.left()
@@ -111,12 +119,13 @@ class motors_enc_setup(object):
                 if(self.des_x < 0.05 and self.des_y < 0.05):
                     self.stop();
                     print("Robot Reached Goal ")
-                    goal_not_reached = False
+                    self.goal_not_reached = False
                 else :
-                    forward()
+                    self.forward()
 
             else:
                 print("Car reached the destination")
+                self.go_to_goal=False
 
 
 
@@ -151,10 +160,12 @@ class motors_enc_setup(object):
         print("Error " ,self.error , "Left PWM " , self.left_pwm)
 
         #return self.error
-
+    def reached_goal(self):
+        return self.go_to_goal
     def motor_turn_off(self):
         GPIO.cleanup()
         sys.exit(0)
+
 
 
 
@@ -188,9 +199,9 @@ object_.save_book()
 '''
 class Network_data_to_excel:
     def __init__(self,file_name):
-      self.ssid_command     = self.cmdline('iwlist wlan0 scan |  grep "SSID"' ).decode("utf-8")
-      self.mac_command      = self.cmdline('iwlist wlan0 scan |  grep "Address"' ).decode("utf-8")
-      self.strength_command = self.cmdline('iwlist wlan0 scan |  grep "Quality"' ).decode("utf-8")
+      self.ssid_command     = self.cmdline('sudo iwlist wlan0 scan |  grep "SSID"' ).decode("utf-8")
+      self.mac_command      = self.cmdline('sudo iwlist wlan0 scan |  grep "Address"' ).decode("utf-8")
+      self.strength_command = self.cmdline('sudo iwlist wlan0 scan |  grep "Quality"' ).decode("utf-8")
       self.file_name=file_name
       self.index =1
 

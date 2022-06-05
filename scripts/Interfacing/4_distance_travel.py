@@ -126,8 +126,8 @@ def Update_Motors_Speeds() :
         else:
             angle_fixed = False
             print("\n\nAngle is set towards Goal\n\n")
-        # pwm_1.ChangeDutyCycle(rightMotorSpeed)
-        # pwm_2.ChangeDutyCycle(leftMotorSpeed)
+        pwm_1.ChangeDutyCycle(rightMotorSpeed)
+        pwm_2.ChangeDutyCycle(leftMotorSpeed)
 
 
     # Moving Forward
@@ -138,16 +138,16 @@ def Update_Motors_Speeds() :
                 print("Robot Reached Goal ")
                 goal_not_reached = False
             else :
-                base_speed=25 # for the dutycyle being positive
-                rightMotorSpeed = base_speed +  10*error ;
-                leftMotorSpeed =  base_speed -  10*error  ;
+                # base_speed=25 # for the dutycyle being positive
+                # rightMotorSpeed = base_speed +  10*error ;
+                # leftMotorSpeed =  base_speed -  10*error  ;
 
-                rightMotorSpeed = np.clip(rightMotorSpeed, 20, 35);
-                leftMotorSpeed  = np.clip(leftMotorSpeed, 20, 35);
-                print("LPWM: ",round(leftMotorSpeed,3)," RPWM ",round(rightMotorSpeed,3))
+                # rightMotorSpeed = np.clip(rightMotorSpeed, 20, 35);
+                # leftMotorSpeed  = np.clip(leftMotorSpeed, 20, 35);
+                # print("LPWM: ",round(leftMotorSpeed,3)," RPWM ",round(rightMotorSpeed,3))
 
-                # pwm_1.ChangeDutyCycle(45)
-                # pwm_2.ChangeDutyCycle(28)
+                pwm_1.ChangeDutyCycle(45)
+                pwm_2.ChangeDutyCycle(28)
         else:
             print("Car reached the destination")
 
@@ -164,8 +164,8 @@ if __name__ == '__main__':
 
     pwm_1=GPIO.PWM(right_motor_en,1000)
     pwm_2=GPIO.PWM(left_motor_en,1000)
-    pwm_1.start(0) # starting is turned OFF
-    pwm_2.start(0)
+    pwm_1.start(20) # starting is turned OFF
+    pwm_2.start(20)
     GPIO.output(right_motor_a,GPIO.HIGH)
     GPIO.output(right_motor_b,GPIO.LOW)
     GPIO.output(left_motor_a,GPIO.HIGH)

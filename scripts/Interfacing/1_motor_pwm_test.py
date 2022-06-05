@@ -4,8 +4,8 @@ This script is to test drive the motors and pwm signals with real time user inpu
 import RPi.GPIO as GPIO
 from time import sleep
 
-right_motor_a = 23
-right_motor_b = 24
+right_motor_a = 24
+right_motor_b = 23
 right_motor_en = 25
 
 left_motor_a = 14
