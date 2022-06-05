@@ -33,7 +33,8 @@ error =0;
 AXLE_LENGTH           = 0.129
 PULSES_PER_REVOLUTION = 135
 WHEEL_DIAMETER        = 0.067
-meter_per_ticks       = math.pi * WHEEL_DIAMETER / PULSES_PER_REVOLUTION;
+meter_per_ticks       = math.pi * WHEEL_DIAMETER / PULSES_PER_REVOLUTION
+
 count_R =0;count_L=0;
 x = 0
 y = 0
@@ -108,6 +109,7 @@ def Go_to_Goal_Calculations():
 
     print("Des_X: ", round(des_x,3), " Des_Y: ", round(des_y,3)," DTG :",round(distance_to_goal,3), " Error: ",round(error,3) ," ATG ", round(angle_to_goal,3) )
     Update_Motors_Speeds()
+
 def Stop_Robot():
     pwm_1.ChangeDutyCycle(0)
     pwm_2.ChangeDutyCycle(0)

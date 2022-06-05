@@ -2,70 +2,16 @@
 This Class conatins a class to initialize encoders connected to motor as well as all motor connection for PWM driving
 
 '''
+from turtle import forward
 import RPi.GPIO as GPIO
 import sys
 from subprocess import PIPE, Popen
 from xlwt import Workbook
+import math
+import numpy as np
 
-
-class encoder_setup(object):
-    def __init__(self, r_en_a,r_en_b,l_en_a,l_en_b):
-        GPIO.setmode(GPIO.BCM)
-        GPIO.setup(r_en_a, GPIO.IN,pull_up_down=GPIO.PUD_UP)
-        GPIO.setup(r_en_b, GPIO.IN,pull_up_down=GPIO.PUD_UP)
-        GPIO.setup(l_en_a, GPIO.IN,pull_up_down=GPIO.PUD_UP)
-        GPIO.setup(l_en_b, GPIO.IN,pull_up_down=GPIO.PUD_UP)
-        self.l_en_a=l_en_a;self.l_en_b=l_en_b;
-        self.r_en_a=r_en_a;self.r_en_b=r_en_b;
-
-        GPIO.add_event_detect(r_en_a, GPIO.BOTH,
-                              callback=self.Update_encR,bouncetime=5)
-        GPIO.add_event_detect(l_en_a, GPIO.BOTH,
-                              callback=self.Update_encL,bouncetime=5)
-        self.count_R =0
-        self.count_L=0
-
-    def Update_encR(self,channel):
-        if GPIO.input(self.r_en_a) == GPIO.input(self.r_en_b):
-            self.count_R=self.count_R + 1
-        else :
-            self.count_R = self.count_R - 1
-        #print(self.count_R)
-
-
-
-    def Update_encL(self,channel):
-        if GPIO.input(self.l_en_a) == GPIO.input(self.l_en_b):
-            self.count_L=self.count_L + 1
-        else :
-            self.count_L = self.count_L - 1
-        #print(self.count_L)
-
-
-    def get_r_enc(self):
-        return self.count_R
-
-
-    def get_l_enc(self):
-        return self.count_L
-
-    def print_encoders_values(self):
-        print(self.count_L, " / " ,self.count_R)
-
-
-    def clear_encoders(self):
-        self.count_R=0
-        self.count_L=0
-
-
-
-
-
-
-class motor_setup(object):
-    def __init__(self,mr_a,mr_b,mr_en,ml_a,ml_b,ml_en):
-
-
+class motors_enc_setup(object):
+    def __init__(self,mr_a,mr_b,mr_en,ml_a,ml_b,ml_en,mr_enc,ml_enc):
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(mr_a, GPIO.OUT)
         GPIO.setup(mr_b, GPIO.OUT)
@@ -73,10 +19,18 @@ class motor_setup(object):
         GPIO.setup(ml_a, GPIO.OUT)
         GPIO.setup(ml_b, GPIO.OUT)
         GPIO.setup(ml_en,GPIO.OUT)
+
         GPIO.output(mr_a,GPIO.HIGH)
         GPIO.output(mr_b,GPIO.LOW)
         GPIO.output(ml_a,GPIO.HIGH)
         GPIO.output(ml_b,GPIO.LOW)
+
+
+        GPIO.setup(mr_enc, GPIO.IN,pull_up_down=GPIO.PUD_UP)
+        GPIO.setup(ml_enc, GPIO.IN,pull_up_down=GPIO.PUD_UP)
+        GPIO.add_event_detect(mr_enc, GPIO.BOTH,callback=self.Update_encR,bouncetime=5)
+        GPIO.add_event_detect(ml_enc, GPIO.BOTH,callback=self.Update_encL,bouncetime=5)
+
         self.mr_a=mr_a;self.mr_b=mr_b;self.ml_a=ml_a;self.ml_a=mr_a;self.ml_b=ml_b;
         self.mr_en=mr_en;self.ml_en=ml_en
         self.pwm_r =  GPIO.PWM(mr_en,1000)
@@ -86,6 +40,89 @@ class motor_setup(object):
         self.left_pwm=0;
 
 
+        self.count_R =0;        self.count_L=0
+        self.x = 0;self.y = 0;self.theta =0
+        self.angle_fixed = True;self.goal_not_reached= True
+        self.des_x=0;self.des_y=0;self.error =0;
+
+        self.AXLE_LENGTH      = 0.129
+        PULSES_PER_REVOLUTION = 135;   WHEEL_DIAMETER        = 0.067
+        self.meter_per_ticks  = math.pi * WHEEL_DIAMETER / PULSES_PER_REVOLUTION
+
+
+    def Update_encR(self,):
+        self.count_R=self.count_R + 1
+        self.calculate_xy()
+
+    def Update_encL(self,):
+        self.count_L=self.count_L + 1
+        self.calculate_xy()
+
+    def calculate_xy(self):
+        count_L_prev = self.count_L
+        count_R_prev = self.count_R
+        self.clear_encoders()
+
+        disp_l_wheel = float(count_L_prev) * self.meter_per_ticks            # geting distance in meters each wheel has traveled
+        disp_r_wheel = float(count_R_prev) * self.meter_per_ticks
+
+        if (count_L_prev == count_R_prev):
+            self.x += disp_l_wheel * math.cos(theta)
+            self.y += disp_l_wheel * math.sin(theta)
+
+        else:
+            orientation_angle = (disp_r_wheel - disp_l_wheel)/self.AXLE_LENGTH
+            disp_body   = (disp_r_wheel + disp_l_wheel) / 2.0;
+            self.x += (disp_body/orientation_angle) * (math.sin(orientation_angle + self.theta) - math.sin(self.theta))
+            self.y -= (disp_body/orientation_angle) * (math.cos(orientation_angle + self.theta) - math.cos(self.theta))
+            theta += orientation_angle
+
+
+        while(self.theta > math.pi):
+            self.theta -= (2.0*math.pi)
+        while(self.theta < -math.pi):
+            self.theta += (2.0*math.pi)
+
+        print("X: " , round(x,3) ," Y: " , round(y,3) , " Theta: ",round(theta,3))
+        # self.Go_to_Goal_Calculations()
+
+    def Go_to_Goal_Calculations(self,goal_x,goal_y):
+        self.des_x = goal_x - self.x;
+        self.des_y = goal_y - self.y;
+        angle_to_goal = math.atan2(self.des_y, self.des_x);
+        distance_to_goal  = math.sqrt(math.pow(self.des_x, 2) + math.pow(self.des_y, 2)); # distance to goal
+        error = angle_to_goal - self.theta;
+        print("self.des_x: ", round(self.des_x,3), " self.des_y: ", round(self.des_y,3)," DTG :",round(distance_to_goal,3), " Error: ",round(error,3) ," ATG ", round(angle_to_goal,3) )
+        self.Update_Motors_Speeds()
+
+
+    def Update_Motors_Speeds(self) :
+        if(angle_fixed):
+            if(self.error <= 0):
+                angle_fixed = False
+                print("\n\nAngle is set towards Goal\n\n")
+            else:
+                self.left()
+
+
+        # Moving Forward
+        else:
+            if(self.goal_not_reached):
+                if(self.des_x < 0.05 and self.des_y < 0.05):
+                    self.stop();
+                    print("Robot Reached Goal ")
+                    goal_not_reached = False
+                else :
+                    forward()
+
+            else:
+                print("Car reached the destination")
+
+
+
+    def clear_encoders(self):
+        self.count_R=0
+        self.count_L=0
 
     def stop(self):
         self.pwm_r.ChangeDutyCycle(0)
@@ -98,8 +135,6 @@ class motor_setup(object):
     def right(self):
         self.pwm_r.ChangeDutyCycle(0)
         self.pwm_l.ChangeDutyCycle(60)
-
-
 
     def forward(self):
         self.pwm_r.ChangeDutyCycle(30)
@@ -116,9 +151,18 @@ class motor_setup(object):
         print("Error " ,self.error , "Left PWM " , self.left_pwm)
 
         #return self.error
+
     def motor_turn_off(self):
         GPIO.cleanup()
         sys.exit(0)
+
+
+
+
+
+
+
+
 
 '''
 This script conatins a class to add entries of
