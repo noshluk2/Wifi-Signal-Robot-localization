@@ -198,12 +198,14 @@ object_.save_book()
 
 '''
 class Network_data_to_excel:
+    
     def __init__(self,file_name):
-      self.ssid_command     = self.cmdline('sudo iwlist wlan0 scan |  grep "SSID"' ).decode("utf-8")
-      self.mac_command      = self.cmdline('sudo iwlist wlan0 scan |  grep "Address"' ).decode("utf-8")
-      self.strength_command = self.cmdline('sudo iwlist wlan0 scan |  grep "Quality"' ).decode("utf-8")
-      self.file_name=file_name
-      self.index =1
+        self.file_name=file_name
+        self.index =1
+    def get_new_scan(self):
+        self.ssid_command     = self.cmdline('sudo iwlist wlan0 scan |  grep "SSID"' ).decode("utf-8")
+        self.mac_command      = self.cmdline('sudo iwlist wlan0 scan |  grep "Address"' ).decode("utf-8")
+        self.strength_command = self.cmdline('sudo iwlist wlan0 scan |  grep "Quality"' ).decode("utf-8")
 
     def open_sheet(self):
         self.excel_book = Workbook()
@@ -226,6 +228,7 @@ class Network_data_to_excel:
             array_out.append(value[end_space:])
         return array_out
     def print_data(self):
+        self.get_new_scan()
         print(self.ssid_command)
         print("-"*60)
         print(self.mac_command)
@@ -233,6 +236,7 @@ class Network_data_to_excel:
         print(self.strength_command)
 
     def data_append(self):
+        self.get_new_scan()
         ssids= self.ssid_command.split("ESSID:")
         ssid_array=ssids[1:]
 
